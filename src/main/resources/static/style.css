@@ -1,0 +1,108 @@
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+body {
+    margin: 0;
+    background: #f4f4f8;
+    color: #222;
+}
+
+header {
+    background: #2d2f6b;
+    color: white;
+    padding: 24px;
+    text-align: center;
+}
+
+main {
+    max-width: 700px;
+    margin: 24px auto;
+    padding: 0 16px;
+}
+
+section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input, textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+button {
+    background: #2d2f6b;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+button:hover {
+    background: #4143a0;
+}
+
+.error {
+    color: #c0392b;
+    font-size: 13px;
+}
+
+.post-card {
+    border-bottom: 1px solid #eee;
+    padding: 14px 0;
+}
+
+.post-card:last-child {
+    border-bottom: none;
+}
+
+.post-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0 0 4px 0;
+}
+
+.post-meta {
+    font-size: 12px;
+    color: #777;
+    margin-bottom: 8px;
+}
+
+.post-content {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.post-actions {
+    margin-top: 8px;
+    display: flex;
+    gap: 8px;
+}
+
+.post-actions button {
+    font-size: 12px;
+    padding: 6px 10px;
+}
+
+.delete-btn {
+    background: #c0392b;
+}
+
+.delete-btn:hover {
+    background: #e74c3c;
+}

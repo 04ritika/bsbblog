@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BSB Blog</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>BSB Blog</h1>
+        <p>Share your thoughts with the world</p>
+    </header>
+
+    <main>
+        <section id="new-post-section">
+            <h2>Write a New Post</h2>
+            <form id="post-form">
+                <input type="text" id="author" placeholder="Your name" required>
+                <input type="text" id="title" placeholder="Post title" required>
+                <textarea id="content" placeholder="Write your post here..." rows="4" required></textarea>
+                <button type="submit">Publish Post</button>
+            </form>
+            <p id="form-error" class="error"></p>
+        </section>
+
+        <section id="posts-section">
+            <h2>All Posts</h2>
+            <div id="posts-container">
+                <p>Loading posts...</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
