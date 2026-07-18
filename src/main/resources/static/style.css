@@ -106,3 +106,32 @@ button:hover {
 .delete-btn:hover {
     background: #e74c3c;
 }
+
+#auth-status {
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+#auth-status button {
+    background: transparent;
+    border: 1px solid white;
+    padding: 4px 10px;
+    font-size: 12px;
+    margin-left: 8px;
+}
+
+#auth-status button:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+a {
+    color: #2d2f6b;
+}
+
+.post-actions .edit-btn {
+    background: #555;
+}
+
+.post-actions .edit-btn:hover {
+    background: #777;
+}
