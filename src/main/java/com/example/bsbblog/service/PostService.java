@@ -1,5 +1,6 @@
 package com.example.bsbblog.service;
 
+import com.example.bsbblog.exception.ForbiddenException;
 import com.example.bsbblog.model.Post;
 import com.example.bsbblog.repository.PostRepository;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,8 @@ public class PostService {
         this.postRepository = postRepository;
     }
 
-    public Post createPost(Post post) {
+    public Post createPost(Post post, String username) {
+        post.setAuthor(username);
         post.setCreatedAt(LocalDateTime.now());
         return postRepository.save(post);
     }
@@ -29,10 +31,13 @@ public class PostService {
                 .orElseThrow(() -> new RuntimeException("Post not found with id: " + id));
     }
 
-    public Post updatePost(String id, Post updatedPost) {
+    public Post updatePost(String id, Post updatedPost, String username) {
         Post existingPost = getPostById(id);
 
-        existingPost.setAuthor(updatedPost.getAuthor());
+        if (!existingPost.getAuthor().equals(username)) {
+            throw new ForbiddenException("You can only edit your own posts");
+        }
+
         existingPost.setTitle(updatedPost.getTitle());
         existingPost.setContent(updatedPost.getContent());
         existingPost.setUpdatedAt(LocalDateTime.now());
@@ -40,10 +45,13 @@ public class PostService {
         return postRepository.save(existingPost);
     }
 
-    public void deletePost(String id) {
-        if (!postRepository.existsById(id)) {
-            throw new RuntimeException("Post not found with id: " + id);
+    public void deletePost(String id, String username) {
+        Post existingPost = getPostById(id);
+
+        if (!existingPost.getAuthor().equals(username)) {
+            throw new ForbiddenException("You can only delete your own posts");
         }
+
         postRepository.deleteById(id);
     }
 }
