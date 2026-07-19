@@ -45,6 +45,13 @@ public class PostService {
         return postRepository.save(existingPost);
     }
 
+    public void deletePostAsAdmin(String id) {
+        if (!postRepository.existsById(id)) {
+            throw new RuntimeException("Post not found with id: " + id);
+        }
+        postRepository.deleteById(id);
+    }
+
     public void deletePost(String id, String username) {
         Post existingPost = getPostById(id);
 
