@@ -135,3 +135,95 @@ a {
 .post-actions .edit-btn:hover {
     background: #777;
 }
+
+.post-social {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.like-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: #555;
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.like-btn.liked {
+    color: #e0245e;
+    font-weight: bold;
+}
+
+.like-btn:hover {
+    background: #f4f4f8;
+    border-radius: 4px;
+}
+
+.comment-toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: #555;
+}
+
+.comments-section {
+    margin-top: 10px;
+    display: none;
+}
+
+.comments-section.open {
+    display: block;
+}
+
+.comment-item {
+    font-size: 13px;
+    padding: 6px 0;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.comment-author {
+    font-weight: bold;
+}
+
+.comment-form {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.comment-form input {
+    flex: 1;
+    padding: 6px;
+    font-size: 13px;
+}
+
+.comment-form button {
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+nav.top-nav {
+    text-align: center;
+    padding: 8px;
+    background: #1a1c4b;
+}
+
+nav.top-nav a {
+    color: white;
+    text-decoration: none;
+    margin: 0 10px;
+    font-size: 13px;
+}
+
+nav.top-nav a:hover {
+    text-decoration: underline;
+}

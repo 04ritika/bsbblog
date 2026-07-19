@@ -6,23 +6,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import java.time.LocalDateTime;
 
-@Document(collection = "users")
+@Document(collection = "comments")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class Comment {
 
     @Id
     private String id;
 
-    @NotBlank(message = "Username cannot be empty")
-    private String username;
+    private String postId;
+    private String author;
 
-    @NotBlank(message = "Password cannot be empty")
-    @Size(min = 6, message = "Password must be at least 6 characters")
-    private String password;
+    @NotBlank(message = "Comment cannot be empty")
+    private String content;
 
-    private String role = "USER";
+    private LocalDateTime createdAt;
 }

@@ -1,8 +1,10 @@
 const API_URL = 'http://localhost:8080/api/posts';
 const AUTH_URL = 'http://localhost:8080/api/auth';
+const COMMENTS_URL = 'http://localhost:8080/api/comments';
 
 let currentUser = localStorage.getItem('bsbblog_username');
 let authToken = localStorage.getItem('bsbblog_token');
+let allPosts = [];
 
 const postForm = document.getElementById('post-form');
 const postsContainer = document.getElementById('posts-container');
@@ -126,34 +128,149 @@ async function loadPosts() {
     postsContainer.innerHTML = '<p>Loading posts...</p>';
     try {
         const response = await fetch(API_URL);
-        const posts = await response.json();
+        allPosts = await response.json();
 
-        if (posts.length === 0) {
+        if (allPosts.length === 0) {
             postsContainer.innerHTML = '<p>No posts yet. Be the first to write one!</p>';
             return;
         }
 
-        posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        allPosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-        postsContainer.innerHTML = posts.map(post => {
-            const isOwner = currentUser && post.author === currentUser;
-            const actions = isOwner
-                ? `<div class="post-actions">
-                       <button onclick="deletePost('${post.id}')" class="delete-btn">Delete</button>
-                   </div>`
-                : '';
-
-            return `
-                <div class="post-card">
-                    <div class="post-title">${escapeHtml(post.title)}</div>
-                    <div class="post-meta">By ${escapeHtml(post.author)} on ${formatDate(post.createdAt)}</div>
-                    <div class="post-content">${escapeHtml(post.content)}</div>
-                    ${actions}
-                </div>
-            `;
-        }).join('');
+        postsContainer.innerHTML = allPosts.map(post => renderPostCard(post)).join('');
     } catch (err) {
         postsContainer.innerHTML = '<p class="error">Failed to load posts. Is the backend running?</p>';
+        console.error(err);
+    }
+}
+
+function renderPostCard(post) {
+    const isOwner = currentUser && post.author === currentUser;
+    const likedBy = post.likedBy || [];
+    const isLiked = currentUser && likedBy.includes(currentUser);
+    const likeCount = likedBy.length;
+
+    const deleteBtn = isOwner
+        ? `<button onclick="deletePost('${post.id}')" class="delete-btn">Delete</button>`
+        : '';
+
+    return `
+        <div class="post-card" id="post-${post.id}">
+            <div class="post-title">${escapeHtml(post.title)}</div>
+            <div class="post-meta">By ${escapeHtml(post.author)} on ${formatDate(post.createdAt)}</div>
+            <div class="post-content">${escapeHtml(post.content)}</div>
+            <div class="post-social">
+                <button class="like-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
+                    ${isLiked ? '\u2665' : '\u2661'} ${likeCount}
+                </button>
+                <button class="comment-toggle-btn" onclick="toggleComments('${post.id}')">Comments</button>
+            </div>
+            <div class="post-actions">${deleteBtn}</div>
+            <div class="comments-section" id="comments-${post.id}">
+                <div class="comments-list" id="comments-list-${post.id}">Loading comments...</div>
+                ${currentUser ? `
+                    <form class="comment-form" onsubmit="submitComment(event, '${post.id}')">
+                        <input type="text" placeholder="Write a comment..." id="comment-input-${post.id}" required>
+                        <button type="submit">Post</button>
+                    </form>
+                ` : '<p style="font-size:12px;color:#888;">Log in to comment</p>'}
+            </div>
+        </div>
+    `;
+}
+
+async function toggleLike(postId) {
+    if (!authToken) {
+        alert('Please log in to like posts.');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/${postId}/like`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) {
+            alert('Failed to like post.');
+            return;
+        }
+
+        const updatedPost = await response.json();
+        const index = allPosts.findIndex(p => p.id === postId);
+        if (index !== -1) allPosts[index] = updatedPost;
+
+        document.getElementById(`post-${postId}`).outerHTML = renderPostCard(updatedPost);
+    } catch (err) {
+        alert('Failed to like post.');
+        console.error(err);
+    }
+}
+
+async function toggleComments(postId) {
+    const section = document.getElementById(`comments-${postId}`);
+    const isOpen = section.classList.contains('open');
+
+    if (isOpen) {
+        section.classList.remove('open');
+        return;
+    }
+
+    section.classList.add('open');
+    await loadComments(postId);
+}
+
+async function loadComments(postId) {
+    const listEl = document.getElementById(`comments-list-${postId}`);
+    listEl.innerHTML = 'Loading comments...';
+
+    try {
+        const response = await fetch(`${COMMENTS_URL}/${postId}`);
+        const comments = await response.json();
+
+        if (comments.length === 0) {
+            listEl.innerHTML = '<p style="font-size:12px;color:#888;">No comments yet.</p>';
+            return;
+        }
+
+        comments.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+        listEl.innerHTML = comments.map(c => `
+            <div class="comment-item">
+                <span class="comment-author">${escapeHtml(c.author)}:</span> ${escapeHtml(c.content)}
+            </div>
+        `).join('');
+    } catch (err) {
+        listEl.innerHTML = '<p class="error">Failed to load comments.</p>';
+        console.error(err);
+    }
+}
+
+async function submitComment(event, postId) {
+    event.preventDefault();
+    const input = document.getElementById(`comment-input-${postId}`);
+    const content = input.value.trim();
+    if (!content) return;
+
+    try {
+        const response = await fetch(`${COMMENTS_URL}/${postId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ content })
+        });
+
+        if (!response.ok) {
+            alert('Failed to post comment.');
+            return;
+        }
+
+        input.value = '';
+        await loadComments(postId);
+    } catch (err) {
+        alert('Failed to post comment.');
         console.error(err);
     }
 }
