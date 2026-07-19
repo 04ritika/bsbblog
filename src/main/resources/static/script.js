@@ -5,8 +5,8 @@ const COMMENTS_URL = 'http://localhost:8080/api/comments';
 let currentUser = localStorage.getItem('bsbblog_username');
 let authToken = localStorage.getItem('bsbblog_token');
 let allPosts = [];
+let currentPostType = 'BLOG';
 
-const postForm = document.getElementById('post-form');
 const postsContainer = document.getElementById('posts-container');
 const formError = document.getElementById('form-error');
 const authStatus = document.getElementById('auth-status');
@@ -32,10 +32,33 @@ document.getElementById('show-login').addEventListener('click', (e) => {
     loginFormContainer.style.display = 'block';
 });
 
+function switchPostType(type) {
+    currentPostType = type;
+    document.querySelectorAll('.type-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.type === type);
+    });
+    document.getElementById('blog-post-form').style.display = type === 'BLOG' ? 'flex' : 'none';
+    document.getElementById('image-post-form').style.display = type === 'IMAGE' ? 'flex' : 'none';
+    document.getElementById('poll-post-form').style.display = type === 'POLL' ? 'flex' : 'none';
+}
+
+function addPollOption() {
+    const container = document.getElementById('poll-options-container');
+    const count = container.children.length + 1;
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'poll-option-input';
+    input.placeholder = `Option ${count}`;
+    input.required = true;
+    container.appendChild(input);
+}
+
 function updateAuthUI() {
     if (authToken && currentUser) {
         const decoded = JSON.parse(atob(authToken.split('.')[1]));
-       const adminLink = decoded.role === 'ADMIN' ? ' <a href="/admin.html" class="admin-link">⚙ Admin Dashboard</a>' : '';        authStatus.innerHTML = `Logged in as <strong>${escapeHtml(currentUser)}</strong>${adminLink} <button id="logout-btn">Logout</button>`;        document.getElementById('logout-btn').addEventListener('click', logout);
+        const adminLink = decoded.role === 'ADMIN' ? ' <a href="/admin.html" class="admin-link">\u2699 Admin Dashboard</a>' : '';
+        authStatus.innerHTML = `Logged in as <a href="/profile.html?user=${encodeURIComponent(currentUser)}"><strong>${escapeHtml(currentUser)}</strong></a>${adminLink} <button id="logout-btn">Logout</button>`;
+        document.getElementById('logout-btn').addEventListener('click', logout);
         authSection.style.display = 'none';
         newPostSection.style.display = 'block';
     } else {
@@ -57,7 +80,6 @@ function logout() {
 registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     registerError.textContent = '';
-
     const username = document.getElementById('register-username').value;
     const password = document.getElementById('register-password').value;
 
@@ -67,19 +89,15 @@ registerForm.addEventListener('submit', async (e) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
         });
-
         const data = await response.json();
-
         if (!response.ok) {
             registerError.textContent = data.error || Object.values(data)[0] || 'Registration failed.';
             return;
         }
-
         authToken = data.token;
         currentUser = data.username;
         localStorage.setItem('bsbblog_token', authToken);
         localStorage.setItem('bsbblog_username', currentUser);
-
         registerForm.reset();
         updateAuthUI();
         loadPosts();
@@ -92,7 +110,6 @@ registerForm.addEventListener('submit', async (e) => {
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     loginError.textContent = '';
-
     const username = document.getElementById('login-username').value;
     const password = document.getElementById('login-password').value;
 
@@ -102,25 +119,118 @@ loginForm.addEventListener('submit', async (e) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
         });
-
         const data = await response.json();
-
         if (!response.ok) {
             loginError.textContent = data.error || 'Login failed.';
             return;
         }
-
         authToken = data.token;
         currentUser = data.username;
         localStorage.setItem('bsbblog_token', authToken);
         localStorage.setItem('bsbblog_username', currentUser);
-
         loginForm.reset();
         updateAuthUI();
         loadPosts();
     } catch (err) {
         loginError.textContent = 'Something went wrong. Is the backend running?';
         console.error(err);
+    }
+});
+
+document.getElementById('blog-post-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    formError.textContent = '';
+
+    const body = {
+        title: document.getElementById('blog-title').value,
+        content: document.getElementById('blog-content').value
+    };
+
+    try {
+        const response = await fetch(`${API_URL}/blog`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+            body: JSON.stringify(body)
+        });
+        if (!response.ok) {
+            const errData = await response.json();
+            formError.textContent = errData.error || Object.values(errData)[0] || 'Something went wrong.';
+            return;
+        }
+        e.target.reset();
+        loadPosts();
+    } catch (err) {
+        formError.textContent = 'Failed to publish. Is the backend running?';
+    }
+});
+
+document.getElementById('image-post-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    formError.textContent = '';
+
+    const fileInput = document.getElementById('image-file');
+    const caption = document.getElementById('image-caption').value;
+
+    if (!fileInput.files[0]) {
+        formError.textContent = 'Please select an image.';
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('image', fileInput.files[0]);
+    formData.append('caption', caption);
+
+    try {
+        const response = await fetch(`${API_URL}/image`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${authToken}` },
+            body: formData
+        });
+        if (!response.ok) {
+            const errData = await response.json();
+            formError.textContent = errData.error || 'Something went wrong.';
+            return;
+        }
+        e.target.reset();
+        loadPosts();
+    } catch (err) {
+        formError.textContent = 'Failed to publish. Is the backend running?';
+    }
+});
+
+document.getElementById('poll-post-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    formError.textContent = '';
+
+    const question = document.getElementById('poll-question').value;
+    const optionInputs = document.querySelectorAll('.poll-option-input');
+    const options = Array.from(optionInputs).map(i => i.value).filter(v => v.trim() !== '');
+    const allowMultiple = document.getElementById('poll-multiple').checked;
+
+    if (options.length < 2) {
+        formError.textContent = 'A poll needs at least 2 options.';
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/poll`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+            body: JSON.stringify({ title: question, options, allowMultipleChoice: allowMultiple })
+        });
+        if (!response.ok) {
+            const errData = await response.json();
+            formError.textContent = errData.error || Object.values(errData)[0] || 'Something went wrong.';
+            return;
+        }
+        e.target.reset();
+        document.getElementById('poll-options-container').innerHTML = `
+            <input type="text" class="poll-option-input" placeholder="Option 1" required>
+            <input type="text" class="poll-option-input" placeholder="Option 2" required>
+        `;
+        loadPosts();
+    } catch (err) {
+        formError.textContent = 'Failed to publish. Is the backend running?';
     }
 });
 
@@ -136,12 +246,49 @@ async function loadPosts() {
         }
 
         allPosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
         postsContainer.innerHTML = allPosts.map(post => renderPostCard(post)).join('');
     } catch (err) {
         postsContainer.innerHTML = '<p class="error">Failed to load posts. Is the backend running?</p>';
-        console.error(err);
     }
+}
+
+function renderPostBody(post) {
+    if (post.type === 'IMAGE') {
+        return `
+            <img src="${post.imageUrl}" class="post-image" alt="Post image">
+            ${post.content ? `<div class="post-content">${escapeHtml(post.content)}</div>` : ''}
+        `;
+    }
+
+    if (post.type === 'POLL') {
+        const totalVotes = post.pollOptions.reduce((sum, o) => sum + o.votedBy.length, 0);
+        const userVoted = currentUser && post.pollOptions.some(o => o.votedBy.includes(currentUser));
+
+        return `
+            <div class="post-title">${escapeHtml(post.title)}</div>
+            <div class="poll-options">
+                ${post.pollOptions.map((opt, idx) => {
+                    const pct = totalVotes > 0 ? Math.round((opt.votedBy.length / totalVotes) * 100) : 0;
+                    const votedThis = currentUser && opt.votedBy.includes(currentUser);
+                    return `
+                        <div class="poll-option-bar ${votedThis ? 'voted' : ''}" onclick="votePoll('${post.id}', ${idx}, ${post.allowMultipleChoice})">
+                            <div class="poll-option-fill" style="width:${userVoted ? pct : 0}%"></div>
+                            <div class="poll-option-content">
+                                <span>${escapeHtml(opt.text)}</span>
+                                <span>${userVoted ? pct + '%' : ''}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+            <div class="post-meta">${totalVotes} vote${totalVotes !== 1 ? 's' : ''} ${post.allowMultipleChoice ? '\u2022 Multiple choice' : ''}</div>
+        `;
+    }
+
+    return `
+        <div class="post-title">${escapeHtml(post.title)}</div>
+        <div class="post-content">${escapeHtml(post.content)}</div>
+    `;
 }
 
 function renderPostCard(post) {
@@ -156,9 +303,12 @@ function renderPostCard(post) {
 
     return `
         <div class="post-card" id="post-${post.id}">
-            <div class="post-title">${escapeHtml(post.title)}</div>
-            <div class="post-meta">By ${escapeHtml(post.author)} on ${formatDate(post.createdAt)}</div>
-            <div class="post-content">${escapeHtml(post.content)}</div>
+            <div class="post-meta">
+                <a href="/profile.html?user=${encodeURIComponent(post.author)}">${escapeHtml(post.author)}</a>
+                on ${formatDate(post.createdAt)}
+                <span class="post-type-badge">${post.type}</span>
+            </div>
+            ${renderPostBody(post)}
             <div class="post-social">
                 <button class="like-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
                     ${isLiked ? '\u2665' : '\u2661'} ${likeCount}
@@ -179,6 +329,48 @@ function renderPostCard(post) {
     `;
 }
 
+async function votePoll(postId, optionIndex, allowMultiple) {
+    if (!authToken) {
+        alert('Please log in to vote.');
+        return;
+    }
+
+    const post = allPosts.find(p => p.id === postId);
+    let optionIndexes = [optionIndex];
+
+    if (allowMultiple) {
+        const currentVotes = post.pollOptions
+            .map((o, i) => o.votedBy.includes(currentUser) ? i : -1)
+            .filter(i => i !== -1);
+        if (currentVotes.includes(optionIndex)) {
+            optionIndexes = currentVotes.filter(i => i !== optionIndex);
+        } else {
+            optionIndexes = [...currentVotes, optionIndex];
+        }
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/${postId}/vote`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+            body: JSON.stringify({ optionIndexes })
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            alert(data.error || 'Failed to vote.');
+            return;
+        }
+
+        const updatedPost = await response.json();
+        const index = allPosts.findIndex(p => p.id === postId);
+        if (index !== -1) allPosts[index] = updatedPost;
+        document.getElementById(`post-${postId}`).outerHTML = renderPostCard(updatedPost);
+    } catch (err) {
+        alert('Failed to vote.');
+    }
+}
+
 async function toggleLike(postId) {
     if (!authToken) {
         alert('Please log in to like posts.');
@@ -190,32 +382,26 @@ async function toggleLike(postId) {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
-
         if (!response.ok) {
             alert('Failed to like post.');
             return;
         }
-
         const updatedPost = await response.json();
         const index = allPosts.findIndex(p => p.id === postId);
         if (index !== -1) allPosts[index] = updatedPost;
-
         document.getElementById(`post-${postId}`).outerHTML = renderPostCard(updatedPost);
     } catch (err) {
         alert('Failed to like post.');
-        console.error(err);
     }
 }
 
 async function toggleComments(postId) {
     const section = document.getElementById(`comments-${postId}`);
     const isOpen = section.classList.contains('open');
-
     if (isOpen) {
         section.classList.remove('open');
         return;
     }
-
     section.classList.add('open');
     await loadComments(postId);
 }
@@ -223,18 +409,14 @@ async function toggleComments(postId) {
 async function loadComments(postId) {
     const listEl = document.getElementById(`comments-list-${postId}`);
     listEl.innerHTML = 'Loading comments...';
-
     try {
         const response = await fetch(`${COMMENTS_URL}/${postId}`);
         const comments = await response.json();
-
         if (comments.length === 0) {
             listEl.innerHTML = '<p style="font-size:12px;color:#888;">No comments yet.</p>';
             return;
         }
-
         comments.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-
         listEl.innerHTML = comments.map(c => `
             <div class="comment-item">
                 <span class="comment-author">${escapeHtml(c.author)}:</span> ${escapeHtml(c.content)}
@@ -242,7 +424,6 @@ async function loadComments(postId) {
         `).join('');
     } catch (err) {
         listEl.innerHTML = '<p class="error">Failed to load comments.</p>';
-        console.error(err);
     }
 }
 
@@ -255,79 +436,35 @@ async function submitComment(event, postId) {
     try {
         const response = await fetch(`${COMMENTS_URL}/${postId}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
-            },
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
             body: JSON.stringify({ content })
         });
-
         if (!response.ok) {
             alert('Failed to post comment.');
             return;
         }
-
         input.value = '';
         await loadComments(postId);
     } catch (err) {
         alert('Failed to post comment.');
-        console.error(err);
     }
 }
 
-postForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    formError.textContent = '';
-
-    const newPost = {
-        title: document.getElementById('title').value,
-        content: document.getElementById('content').value
-    };
-
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
-            },
-            body: JSON.stringify(newPost)
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            const firstError = errorData.error || Object.values(errorData)[0];
-            formError.textContent = firstError || 'Something went wrong.';
-            return;
-        }
-
-        postForm.reset();
-        loadPosts();
-    } catch (err) {
-        formError.textContent = 'Failed to publish post. Is the backend running?';
-        console.error(err);
-    }
-});
-
 async function deletePost(id) {
     if (!confirm('Delete this post?')) return;
-
     try {
         const response = await fetch(`${API_URL}/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
-
         if (!response.ok) {
             const data = await response.json();
             alert(data.error || 'Failed to delete post.');
             return;
         }
-
         loadPosts();
     } catch (err) {
         alert('Failed to delete post.');
-        console.error(err);
     }
 }
 
@@ -337,6 +474,7 @@ function formatDate(dateString) {
 }
 
 function escapeHtml(text) {
+    if (text === null || text === undefined) return '';
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;

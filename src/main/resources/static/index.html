@@ -38,12 +38,38 @@
         </section>
 
         <section id="new-post-section" style="display:none;">
-            <h2>Write a New Post</h2>
-            <form id="post-form">
-                <input type="text" id="title" placeholder="Post title" required>
-                <textarea id="content" placeholder="Write your post here..." rows="4" required></textarea>
-                <button type="submit">Publish Post</button>
+            <h2>Create a Post</h2>
+            <div class="post-type-tabs">
+                <button type="button" class="type-tab active" data-type="BLOG" onclick="switchPostType('BLOG')">Blog</button>
+                <button type="button" class="type-tab" data-type="IMAGE" onclick="switchPostType('IMAGE')">Image</button>
+                <button type="button" class="type-tab" data-type="POLL" onclick="switchPostType('POLL')">Poll</button>
+            </div>
+
+            <form id="blog-post-form" class="post-type-form">
+                <input type="text" id="blog-title" placeholder="Post title" required>
+                <textarea id="blog-content" placeholder="Write your post here..." rows="4" required></textarea>
+                <button type="submit">Publish Blog Post</button>
             </form>
+
+            <form id="image-post-form" class="post-type-form" style="display:none;">
+                <input type="file" id="image-file" accept="image/*" required>
+                <input type="text" id="image-caption" placeholder="Write a caption (optional)">
+                <button type="submit">Publish Image Post</button>
+            </form>
+
+            <form id="poll-post-form" class="post-type-form" style="display:none;">
+                <input type="text" id="poll-question" placeholder="Ask a question..." required>
+                <div id="poll-options-container">
+                    <input type="text" class="poll-option-input" placeholder="Option 1" required>
+                    <input type="text" class="poll-option-input" placeholder="Option 2" required>
+                </div>
+                <button type="button" onclick="addPollOption()">+ Add Option</button>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="poll-multiple"> Allow multiple choice
+                </label>
+                <button type="submit">Publish Poll</button>
+            </form>
+
             <p id="form-error" class="error"></p>
         </section>
 

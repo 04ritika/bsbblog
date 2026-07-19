@@ -286,3 +286,79 @@ nav.top-nav a:hover {
 .admin-link:hover {
     background: #ffb74d;
 }
+
+.post-type-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 14px;
+}
+
+.type-tab {
+    background: #eee;
+    color: #333;
+    padding: 8px 16px;
+    border-radius: 6px 6px 0 0;
+}
+
+.type-tab.active {
+    background: #2d2f6b;
+    color: white;
+}
+
+.checkbox-label {
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.checkbox-label input {
+    width: auto;
+}
+
+.post-image {
+    max-width: 100%;
+    border-radius: 6px;
+    margin: 8px 0;
+    display: block;
+}
+
+.poll-option-bar {
+    position: relative;
+    background: #f0f0f4;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin: 6px 0;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.poll-option-fill {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    background: #c8caf0;
+    z-index: 0;
+    transition: width 0.3s;
+}
+
+.poll-option-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+}
+
+.poll-option-bar.voted {
+    border: 2px solid #2d2f6b;
+}
+
+.post-type-badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 8px;
+    background: #eee;
+    color: #666;
+    margin-left: 6px;
+}
