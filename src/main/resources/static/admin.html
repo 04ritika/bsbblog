@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BSB Blog � Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Admin Dashboard</h1>
+        <p>Manage users and posts</p>
+        <nav class="top-nav">
+            <a href="/">Back to Blog</a>
+        </nav>
+    </header>
+
+    <main>
+        <section id="access-denied" style="display:none;">
+            <h2>Access Denied</h2>
+            <p>You must be logged in as an admin to view this page.</p>
+        </section>
+
+        <div id="admin-content" style="display:none;">
+            <section id="users-section">
+                <h2>All Users</h2>
+                <div id="users-container">Loading users...</div>
+            </section>
+
+            <section id="admin-posts-section">
+                <h2>All Posts</h2>
+                <div id="admin-posts-container">Loading posts...</div>
+            </section>
+            <section id="admin-comments-section">
+                <h2>All Comments</h2>
+                <div id="admin-comments-container">Loading comments...</div>
+            </section>
+        </div>
+    </main>
+
+    <script src="admin.js"></script>
+</body>
+</html>

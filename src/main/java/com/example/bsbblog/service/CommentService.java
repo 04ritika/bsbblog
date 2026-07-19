@@ -15,7 +15,9 @@ public class CommentService {
     public CommentService(CommentRepository commentRepository) {
         this.commentRepository = commentRepository;
     }
-
+    public List<Comment> getAllComments() {
+        return commentRepository.findAll();
+    }
     public Comment addComment(String postId, String content, String username) {
         Comment comment = new Comment();
         comment.setPostId(postId);

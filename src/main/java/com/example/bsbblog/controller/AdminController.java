@@ -1,7 +1,9 @@
 package com.example.bsbblog.controller;
 
+import com.example.bsbblog.model.Comment;
 import com.example.bsbblog.model.Post;
 import com.example.bsbblog.model.User;
+import com.example.bsbblog.service.CommentService;
 import com.example.bsbblog.service.PostService;
 import com.example.bsbblog.service.UserService;
 import org.springframework.web.bind.annotation.*;
@@ -14,10 +16,12 @@ public class AdminController {
 
     private final UserService userService;
     private final PostService postService;
+    private final CommentService commentService;
 
-    public AdminController(UserService userService, PostService postService) {
+    public AdminController(UserService userService, PostService postService, CommentService commentService) {
         this.userService = userService;
         this.postService = postService;
+        this.commentService = commentService;
     }
 
     @GetMapping("/users")
@@ -45,5 +49,10 @@ public class AdminController {
     public String deletePostAsAdmin(@PathVariable String id) {
         postService.deletePostAsAdmin(id);
         return "Post deleted successfully";
+    }
+
+    @GetMapping("/comments")
+    public List<Comment> getAllComments() {
+        return commentService.getAllComments();
     }
 }

@@ -16,3 +16,4 @@ Thumbs.db
 
 # Sensitive config (contains real DB password)
 application-secrets.properties
+uploads/

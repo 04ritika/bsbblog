@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.List;
 
 @Document(collection = "posts")
 @Data
@@ -19,12 +22,21 @@ public class Post {
 
     private String author;
 
-    @NotBlank(message = "Title cannot be empty")
+    private String type = "BLOG"; // BLOG, IMAGE, or POLL
+
     private String title;
 
-    @NotBlank(message = "Content cannot be empty")
     private String content;
+
+    // IMAGE type only
+    private String imageUrl;
+
+    // POLL type only
+    private List<PollOption> pollOptions;
+    private boolean allowMultipleChoice;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    private Set<String> likedBy = new HashSet<>();
 }

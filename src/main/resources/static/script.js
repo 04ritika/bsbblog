@@ -34,8 +34,8 @@ document.getElementById('show-login').addEventListener('click', (e) => {
 
 function updateAuthUI() {
     if (authToken && currentUser) {
-        authStatus.innerHTML = `Logged in as <strong>${escapeHtml(currentUser)}</strong> <button id="logout-btn">Logout</button>`;
-        document.getElementById('logout-btn').addEventListener('click', logout);
+        const decoded = JSON.parse(atob(authToken.split('.')[1]));
+       const adminLink = decoded.role === 'ADMIN' ? ' <a href="/admin.html" class="admin-link">⚙ Admin Dashboard</a>' : '';        authStatus.innerHTML = `Logged in as <strong>${escapeHtml(currentUser)}</strong>${adminLink} <button id="logout-btn">Logout</button>`;        document.getElementById('logout-btn').addEventListener('click', logout);
         authSection.style.display = 'none';
         newPostSection.style.display = 'block';
     } else {

@@ -227,3 +227,62 @@ nav.top-nav a {
 nav.top-nav a:hover {
     text-decoration: underline;
 }
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.admin-table th, .admin-table td {
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.admin-table th {
+    background: #f4f4f8;
+}
+
+.role-badge {
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.role-badge.ADMIN {
+    background: #2d2f6b;
+    color: white;
+}
+
+.role-badge.USER {
+    background: #ddd;
+    color: #333;
+}
+
+.admin-table select {
+    font-size: 12px;
+    padding: 3px;
+}
+
+.admin-table .delete-btn {
+    font-size: 11px;
+    padding: 4px 8px;
+}
+
+.admin-link {
+    display: inline-block;
+    background: #ff9800;
+    color: #1a1c4b !important;
+    font-weight: bold;
+    padding: 4px 12px;
+    border-radius: 12px;
+    text-decoration: none;
+    margin-left: 8px;
+    font-size: 13px;
+}
+
+.admin-link:hover {
+    background: #ffb74d;
+}
