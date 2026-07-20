@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile — BSB Blog</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1 id="profile-username">Profile</h1>
+        <nav class="top-nav">
+            <a href="/">Back to Feed</a>
+        </nav>
+    </header>
+
+    <main>
+        <section id="profile-stats">
+            <div class="stat"><span id="stat-posts">0</span> Posts</div>
+            <div class="stat"><span id="stat-likes">0</span> Likes Received</div>
+        </section>
+
+        <section>
+            <h2>Posts</h2>
+            <div id="profile-grid" class="profile-grid">
+                <p>Loading posts...</p>
+            </div>
+        </section>
+    </main>
+
+    <div id="post-modal" class="modal-overlay" style="display:none;" onclick="closeModalOnOverlay(event)">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="profile.js"></script>
+</body>
+</html>
