@@ -107,6 +107,20 @@ button:hover {
     background: #e74c3c;
 }
 
+.admin-link {
+    background-color: #ff8c00;
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.2s ease;
+}
+
+.admin-link:hover {
+    background-color: #e67e00;
+}
+
 #auth-status {
     margin-top: 10px;
     font-size: 14px;
@@ -226,4 +240,139 @@ nav.top-nav a {
 
 nav.top-nav a:hover {
     text-decoration: underline;
+}
+
+#category-filters {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.category-btn {
+    background: white;
+    color: #2d2f6b;
+    border: 1px solid #2d2f6b;
+    padding: 6px 16px;
+    border-radius: 16px;
+    font-size: 13px;
+}
+
+.category-btn.active {
+    background: #2d2f6b;
+    color: white;
+}
+
+.category-row {
+    margin-bottom: 24px;
+}
+
+.category-row h3 {
+    font-size: 15px;
+    color: #444;
+    margin-bottom: 8px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 4px;
+}
+
+.club-row-scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+}
+
+.club-card {
+    min-width: 160px;
+    background: white;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.club-card img {
+    width: 100%;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    background: #eee;
+}
+
+.club-card-name {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.club-card-meta {
+    font-size: 11px;
+    color: #888;
+}
+
+.club-profile-header {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.club-profile-header img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #eee;
+}
+
+.club-tabs {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 12px;
+}
+
+.club-tab-btn {
+    background: none;
+    color: #555;
+    padding: 8px 14px;
+    border-radius: 0;
+    border-bottom: 2px solid transparent;
+}
+
+.club-tab-btn.active {
+    color: #2d2f6b;
+    border-bottom: 2px solid #2d2f6b;
+    font-weight: bold;
+}
+
+.club-tab-content {
+    display: none;
+}
+
+.club-tab-content.active {
+    display: block;
+}
+
+.event-item, .announcement-item, .member-item {
+    background: #f8f8fb;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+
+.event-date {
+    color: #888;
+    font-size: 11px;
+}
+
+.manager-badge {
+    background: #2d2f6b;
+    color: white;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 8px;
+    margin-left: 6px;
 }
